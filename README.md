@@ -8,11 +8,11 @@ A simple web application which provides a list of items in categories and integr
 
 2. Launch the Vagrant VM from inside the *vagrant* folder with:
 
-```bash vagrant up```
+``` vagrant up```
 
 3. Then access the shell with:
 
-```bash vagrant ssh```
+``` vagrant ssh```
 
 4. Then move inside the catalog folder:
 
