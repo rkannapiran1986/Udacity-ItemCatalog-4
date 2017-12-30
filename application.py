@@ -59,7 +59,9 @@ def showCategories():
 
     # Get lastest 5 category items added
     categoryItems = session.query(CategoryItem).all()
-    return render_template('categories.html', categories=categories, categoryItems=categoryItems)
+    return render_template('categories.html',
+                           categories=categories,
+                           categoryItems=categoryItems)
 
 
 @app.route('/catalog/<int:catalog_id>')
@@ -75,12 +77,18 @@ def showCategory(catalog_id):
     categoryName = category.name
 
     # Get all items of a specific category
-    categoryItems = session.query(CategoryItem).filter_by(category_id=catalog_id).all()
+    categoryItems = session.query(CategoryItem).filter_by(
+        category_id=catalog_id).all()
 
     # Get count of category items
-    categoryItemsCount = session.query(CategoryItem).filter_by(category_id=catalog_id).count()
+    categoryItemsCount = session.query(CategoryItem).filter_by(
+        category_id=catalog_id).count()
 
-    return render_template('category.html', categories=categories, categoryItems=categoryItems, categoryName=categoryName, categoryItemsCount=categoryItemsCount)
+    return render_template('category.html',
+                           categories=categories,
+                           categoryItems=categoryItems,
+                           categoryName=categoryName,
+                           categoryItemsCount=categoryItemsCount)
 
 
 @app.route('/catalog/<int:catalog_id>/items/<int:item_id>')
@@ -91,7 +99,9 @@ def showCategoryItem(catalog_id, item_id):
     # Get creator of item
     creator = getUserInfo(categoryItem.user_id)
 
-    return render_template('categoryItem.html', categoryItem=categoryItem, creator=creator)
+    return render_template('categoryItem.html',
+                           categoryItem=categoryItem,
+                           creator=creator)
 
 
 @app.route('/catalog/add', methods=['GET', 'POST'])
@@ -112,7 +122,10 @@ def addCategoryItem():
             return redirect(url_for('addCategoryItem'))
 
         # Add category item
-        newCategoryItem = CategoryItem(name=request.form['name'], description=request.form['description'], category_id=request.form['category'], user_id=login_session['user_id'])
+        newCategoryItem = CategoryItem(name=request.form['name'],
+                                       description=request.form['description'],
+                                       category_id=request.form['category'],
+                                       user_id=login_session['user_id'])
         session.add(newCategoryItem)
         session.commit()
 
@@ -124,7 +137,8 @@ def addCategoryItem():
         return render_template('addCategoryItem.html', categories=categories)
 
 
-@app.route('/catalog/<int:catalog_id>/items/<int:item_id>/edit', methods=['GET', 'POST'])
+@app.route('/catalog/<int:catalog_id>/items/<int:item_id>/edit',
+           methods=['GET', 'POST'])
 def editCategoryItem(catalog_id, item_id):
     # Check if user is logged in
     if 'username' not in login_session:
@@ -138,7 +152,8 @@ def editCategoryItem(catalog_id, item_id):
 
     # Check if logged in user is creator of category item
     if creator.id != login_session['user_id']:
-        return redirect('/login')
+        return redirect(url_for('showCategories'))
+        # return redirect('/login')
 
     # Get all categories
     categories = session.query(Category).all()
@@ -150,12 +165,17 @@ def editCategoryItem(catalog_id, item_id):
             categoryItem.description = request.form['description']
         if request.form['category']:
             categoryItem.category_id = request.form['category']
-        return redirect(url_for('showCategoryItem', catalog_id=categoryItem.category_id, item_id=categoryItem.id))
+        return redirect(url_for('showCategoryItem',
+                                catalog_id=categoryItem.category_id,
+                                item_id=categoryItem.id))
     else:
-        return render_template('editCategoryItem.html', categories=categories, categoryItem=categoryItem)
+        return render_template('editCategoryItem.html',
+                               categories=categories,
+                               categoryItem=categoryItem)
 
 
-@app.route('/catalog/<int:catalog_id>/items/<int:item_id>/delete', methods=['GET', 'POST'])
+@app.route('/catalog/<int:catalog_id>/items/<int:item_id>/delete',
+           methods=['GET', 'POST'])
 def deleteCategoryItem(catalog_id, item_id):
     # Check if user is logged in
     if 'username' not in login_session:
@@ -169,20 +189,24 @@ def deleteCategoryItem(catalog_id, item_id):
 
     # Check if logged in user is creator of category item
     if creator.id != login_session['user_id']:
-        return redirect('/login')
+        return redirect(url_for('showCategories'))
+        # return redirect('/login')
 
     if request.method == 'POST':
         session.delete(categoryItem)
         session.commit()
-        return redirect(url_for('showCategory', catalog_id=categoryItem.category_id))
+        return redirect(url_for('showCategory',
+                                catalog_id=categoryItem.category_id))
     else:
-        return render_template('deleteCategoryItem.html', categoryItem=categoryItem)
+        return render_template('deleteCategoryItem.html',
+                               categoryItem=categoryItem)
 
 
 @app.route('/login')
 def login():
     # Create anti-forgery state token
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in xrange(32))
     login_session['state'] = state
 
     return render_template('login.html', STATE=state)
@@ -229,11 +253,13 @@ def fbconnect():
     # Use token to get user info from API
     userinfo_url = "https://graph.facebook.com/v2.8/me"
     '''
-        Due to the formatting for the result from the server token exchange we have to
-        split the token first on commas and select the first index which gives us the key : value
-        for the server access token then we split it on colons to pull out the actual token value
-        and replace the remaining quotes with nothing so that it can be used directly in the graph
-        api calls
+        Due to the formatting for the result from the server token
+        exchange we have to split the token first
+        on commas and select the first index which gives us the key : value
+        for the server access token then we split it on colons to pull out
+        the actual token value and replace the remaining quotes
+        with nothing so that it can be used directly in
+        the graph api calls
     '''
     token = result.split(',')[0].split(':')[1].replace('"', '')
 
@@ -272,7 +298,8 @@ def fbconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ''' " style = "width: 300px; height: 300px;border-radius: 150px;
+                  -webkit-border-radius: 150px;-moz-border-radius: 150px;"> '''
 
     flash("Now logged in as %s" % login_session['username'])
     return output
@@ -306,7 +333,8 @@ def gconnect():
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
-        response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
+        response = make_response(json.dumps('''Failed to upgrade
+                                              the authorization code.'''), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -325,13 +353,15 @@ def gconnect():
     # Verify that the access token is used for the intended user.
     gplus_id = credentials.id_token['sub']
     if result['user_id'] != gplus_id:
-        response = make_response(json.dumps("Token's user ID doesn't match given user ID."), 401)
+        response = make_response(json.dumps('''Token's user ID doesn't
+                                               match given user ID.'''), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
     # Verify that the access token is valid for this app.
     if result['issued_to'] != CLIENT_ID:
-        response = make_response(json.dumps("Token's client ID does not match app's."), 401)
+        response = make_response(json.dumps('''Token's client ID
+                                               does not match app's.'''), 401)
         print "Token's client ID does not match app's."
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -340,7 +370,8 @@ def gconnect():
     stored_gplus_id = login_session.get('gplus_id')
 
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'), 200)
+        response = make_response(json.dumps('''Current user is
+                                               already connected.'''), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -373,7 +404,8 @@ def gdisconnect():
     access_token = login_session.get('access_token')
 
     if access_token is None:
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(
+                                json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -383,7 +415,8 @@ def gdisconnect():
 
     if result['status'] != '200':
         # For whatever reason, the given token was invalid.
-        response = make_response(json.dumps('Failed to revoke token for given user.'), 400)
+        response = make_response(json.dumps('''Failed to revoke
+                                               token for given user.'''), 400)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -397,8 +430,10 @@ def showCategoriesJSON():
 @app.route('/catalog/<int:catalog_id>/JSON')
 @app.route('/catalog/<int:catalog_id>/items/JSON')
 def showCategoryJSON(catalog_id):
-    categoryItems = session.query(CategoryItem).filter_by(category_id=catalog_id).all()
-    return jsonify(categoryItems=[categoryItem.serialize for categoryItem in categoryItems])
+    categoryItems = session.query(CategoryItem).filter_by(
+        category_id=catalog_id).all()
+    return jsonify(categoryItems=[categoryItem.serialize
+                   for categoryItem in categoryItems])
 
 
 @app.route('/catalog/<int:catalog_id>/items/<int:item_id>/JSON')
