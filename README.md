@@ -8,24 +8,24 @@ A simple web application which provides a list of items in categories and integr
 
 2. Launch the Vagrant VM from inside the *vagrant* folder with:
 
-`vagrant up`
+``` vagrant up```
 
-Then access the shell with:
+3. Then access the shell with:
 
 `vagrant ssh`
 
-Then move inside the catalog folder:
+4. Then move inside the catalog folder:
 
-`cd /vagrant/catalog`
+`cd /vagrant/Udacity-ItemCatalog-4`
 
-Then run the database configuration using below command (to load with default values):
+5. Then run the database configuration using below command (to load with default values):
 
 `python sampleitems.py`
 
-Then run the application:
+6. Then run the application:
 
 `python application.py`
 
-After the last command you are able to browse the application at this URL:
+7. After the last command you are able to browse the application at this URL:
 
 `http://localhost:8000/`
